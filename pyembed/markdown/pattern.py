@@ -21,13 +21,14 @@
 # THE SOFTWARE.
 
 from markdown.inlinepatterns import Pattern
+from pyembed.core.error import PyEmbedError
 
 try:  # pragma: no cover
     from urlparse import parse_qs
 except ImportError:  # pragma: no cover
     from urllib.parse import parse_qs
 
-REMBED_PATTERN = '\[!embed(\?(.*))?\]\((.*)\)'
+REMBED_PATTERN = "\[!embed(\?(.*))?\]\((.*)\)"
 
 
 class PyEmbedPattern(Pattern):
@@ -41,7 +42,11 @@ class PyEmbedPattern(Pattern):
     def handleMatch(self, m):
         url = m.group(4)
         (max_width, max_height) = self.__parse_params(m.group(3))
-        html = self.pyembed.embed(url, max_width, max_height)
+        try:
+            html = self.pyembed.embed(url, max_width, max_height)
+        except PyEmbedError:
+            html = f"<i>OEmbed Link rot on URL: <a href='{url}'>{url}</a></i>"
+
         return self.md.htmlStash.store(html)
 
     def __parse_params(self, query_string):
@@ -49,8 +54,10 @@ class PyEmbedPattern(Pattern):
             return None, None
 
         query_params = parse_qs(query_string)
-        return (self.__get_query_param(query_params, 'max_width'),
-                self.__get_query_param(query_params, 'max_height'))
+        return (
+            self.__get_query_param(query_params, "max_width"),
+            self.__get_query_param(query_params, "max_height"),
+        )
 
     @staticmethod
     def __get_query_param(query_params, name):

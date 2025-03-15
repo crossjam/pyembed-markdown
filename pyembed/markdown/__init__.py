@@ -31,14 +31,13 @@ class PyEmbedMarkdown(Extension):
         super(PyEmbedMarkdown, self).__init__()
         self.renderer = renderer
 
-    def extendMarkdown(self, md, md_globals):
+    def extendMarkdown(self, md, **kw):
         if self.renderer:
             pyembed = PyEmbed(renderer=self.renderer)
         else:
             pyembed = PyEmbed()
 
-        md.inlinePatterns.add(
-            'pyembed', pattern.PyEmbedPattern(pyembed, md), '_begin')
+        md.inlinePatterns.register(pattern.PyEmbedPattern(pyembed, md), "pyembed", 200)
 
 
 def makeExtension(configs=None):  # pragma: no cover
