@@ -28,7 +28,7 @@ try:  # pragma: no cover
 except ImportError:  # pragma: no cover
     from urllib.parse import parse_qs
 
-REMBED_PATTERN = "\[!embed(\?(.*))?\]\((.*)\)"
+REMBED_PATTERN = r"\[!embed(\?(.*))?\]\((.*)\)"
 
 
 class PyEmbedPattern(Pattern):
